@@ -1,6 +1,5 @@
 package com.eric.entity;
 
-import java.util.Date;
 
 /**
  * @author Chen 2018/1/23

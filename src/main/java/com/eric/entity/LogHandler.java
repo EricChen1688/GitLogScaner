@@ -1,7 +1,6 @@
 package com.eric.entity;
 
 import cn.hutool.core.io.file.FileReader;
-import com.eric.utils.logUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +19,8 @@ public class LogHandler implements FileReader.ReaderHandler<List<LogEntity>> {
         while((line = reader.readLine()) != null){
             if(line.contains("commit")&&!line.contains(".")&&!line.contains(":")&&!line.contains("(")){
                 if (lines.size()>1){
-                    entities.add(logfilter(lines));
+                    LogEntity logfilter = logfilter(lines);
+                    if (logfilter!=null) entities.add(logfilter);
                 }
                 lines = new ArrayList<String>();
                 if (!line.trim().equals(""))
@@ -39,12 +39,7 @@ public class LogHandler implements FileReader.ReaderHandler<List<LogEntity>> {
      * @return 本次提交实体类 Author名字，count 本次提交代码量
      */
     private LogEntity logfilter(List<String> lines){
-        if (lines.size()<3){
-            LogEntity entity = new LogEntity();
-            entity.setAuthor("本次提交不足3行，跳过");
-            entity.setCount(0);
-            return entity;
-        }
+        if (!checkData(lines)) return null;
         LogEntity entity = new LogEntity();
         //统计前三个
         for (int i = 0;i<3;i++){
@@ -65,6 +60,15 @@ public class LogHandler implements FileReader.ReaderHandler<List<LogEntity>> {
             }
         }
         return entity;
+    }
+
+    private boolean checkData(List<String> lines){
+        if (lines.size()<5) return false;
+        for (int i = 0;i<5;i++){
+            String line = lines.get(i);
+            if (line.contains("2017 +0800")) return true;
+        }
+        return false;
     }
 
 }
